@@ -11,6 +11,6 @@ class Color(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
-    sizes = models.ManyToManyField(Size)
-    colors = models.ManyToManyField(Color)
+    sizes = models.ManyToManyField(Size,null=True,blank=True)
+    colors = models.ManyToManyField(Color,null=True,blank=True)
     Price = models.IntegerField(null=False)

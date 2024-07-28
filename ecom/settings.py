@@ -34,6 +34,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'users',
+    'core',
     'products',
     'rest_framework',
     'django.contrib.admin',
@@ -85,6 +86,12 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'core.auth.JWTAuthentication',
+    ],
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -105,7 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'users.backends.EmailBackend',
+    'core.backends.EmailBackend',
     'django.contrib.auth.backends.ModelBackend'
 ]
 
