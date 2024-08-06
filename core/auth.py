@@ -14,7 +14,8 @@ class JWTAuthentication(BaseAuthentication):
             token = parts[1]
             try:
                 payload = jwt.decode(token,settings.JWT_SECRET,algorithms=["HS256"])
-                request.user = get_user_model().objects.get(id=payload["id"])
+                user = get_user_model().objects.get(id=payload["id"])
+                return (user,None)
             except:
                 return None
         return None

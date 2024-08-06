@@ -19,5 +19,5 @@ class SizeViewSet(ModelViewSet):
 
 class ColorViewSet(ModelViewSet):
     serializer_class =  ColorSerializer
-    permission_classes = IsAdminOrReadOnly
+    permission_classes = [IsAdminOrReadOnly]
     queryset = Color.objects.all()

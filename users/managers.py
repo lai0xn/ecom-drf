@@ -12,7 +12,7 @@ class UserManager(BaseUserManager):
         user.save()
         return user
 
-    def create_super_user(self,email,password,**extra_fields):
+    def create_superuser(self,email,password,**extra_fields):
         if not email:
             raise ValueError("email is requred")
         if not password:
@@ -21,6 +21,8 @@ class UserManager(BaseUserManager):
         user = self.model(email=email,**extra_fields)
         user.set_password(password)
         user.is_admin = True
+        user.is_staff = True
+        user.is_superuser = True
         user.save()
         return user
 
