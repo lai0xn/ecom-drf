@@ -11,3 +11,4 @@ class Order(models.Model):
     delivered = models.BooleanField(default=False)
     user = models.ForeignKey(USER_MODEL,on_delete=models.CASCADE)
     Items = models.ManyToManyField(OrderItem)
+    price = models.IntegerField(default=0)

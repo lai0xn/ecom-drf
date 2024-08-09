@@ -21,6 +21,10 @@ class OrderView(viewsets.ModelViewSet):
     def create(self, request, *args, **kwargs):
         items = request.user.cart.items
         request.data["items"] = items
+        price = 0
+        for item in items:
+            price += item.product.price * item.quantity
+        request.data["price"] = price
         serializer = OrderSerializer(data=request.data)
         serializer.save(raise_exception=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
