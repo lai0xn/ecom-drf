@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from .serializers import ColorSerializer, ProductSerializer, ReviewSeralizer, SizeSerializer
-from core.perms import IsAdminOrReadOnly
+from core.perms import IsAdminOrReadOnly, OwnerOrReadOnly
 from .models import Color, Product, Review, Size
 # Create your views here.
 class ProductViewSet(ModelViewSet):
@@ -24,5 +24,5 @@ class ColorViewSet(ModelViewSet):
 
 class ReviewViewSet(ModelViewSet):
     serializer_class = ReviewSeralizer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [OwnerOrReadOnly]
     queryset = Review.objects.all()
