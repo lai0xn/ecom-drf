@@ -33,10 +33,14 @@ def add_to_cart(request,id):
         color=color,
     )
 
+
     if item_q.exists():
         item = item_q[0]
         item.quantity+=quantity
         item.save()
+        
+        product.in_stock -= quantity
+        product.save()
         return Response("Increased quantity",status=status.HTTP_200_OK)
     
     OrderItem.objects.create(
@@ -46,6 +50,11 @@ def add_to_cart(request,id):
         color=color,
         size=size 
     )
+
+    
+    product.in_stock -= quantity
+    product.save()
+
 
     return Response("Proruct added to cart",status=status.HTTP_200_OK)
 

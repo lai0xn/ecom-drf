@@ -1,24 +1,5 @@
 from rest_framework import serializers
-from .models import Product, Review,Size,Color
-
-class ProductSerializer(serializers.ModelSerializer):
-    sizes = serializers.SerializerMethodField()
-    colors = serializers.SerializerMethodField()
-    reviews = serializers.SerializerMethodField()
-    class Meta:
-        model = Product
-        fields="__all__"
-
-    def get_sizes(self,obj):
-        return obj.sizes.all()
-    
-    def get_colors(self,obj):
-        return obj.colors.all()
-
-
-    def get_reviews(self,obj):
-        return obj.review_set.all()
-
+from .models import Media, Product, Review,Size,Color
 
 
 class ReviewSeralizer(serializers.ModelSerializer):
@@ -37,3 +18,33 @@ class ColorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Color
         fields="__all__"
+
+class MediaSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Media
+        fields = "__all__"
+
+
+class ProductSerializer(serializers.ModelSerializer):
+    rating = serializers.SerializerMethodField()
+    sizes = SizeSerializer(many=True)
+    colors = ColorSerializer(many=True)
+    reviews = serializers.SerializerMethodField()
+    media = MediaSerializer(many=True)
+    class Meta:
+        model = Product
+        fields="__all__"
+
+    
+
+    def get_rating(self,obj):
+        rating = 0
+        enteries = 0
+        for review in obj.review_set.all():
+            rating+=review.stars
+            enteries+=1
+
+        if enteries!=0:
+            return rating/enteries
+        return 0
+

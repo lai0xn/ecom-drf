@@ -19,10 +19,17 @@ class Color(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
-    Category = models.CharField(max_length=15,choices=CATEGORIES,default="Abaya")
+    category = models.CharField(max_length=15,choices=CATEGORIES,default="Abaya")
     sizes = models.ManyToManyField(Size,null=True,blank=True)
     colors = models.ManyToManyField(Color,null=True,blank=True)
-    Price = models.IntegerField(null=False)
+    price = models.IntegerField(null=False)
+    created = models.DateTimeField(auto_now_add=True)
+    in_stock = models.IntegerField(default=1,null=False)
+
+
+class Media(models.Model):
+    image = models.ImageField(upload_to="products")
+    product = models.ForeignKey(Product,on_delete=models.CASCADE)
 
 
 class Review(models.Model):

@@ -9,3 +9,5 @@ class OrderItem(models.Model):
     size = models.ForeignKey(Size,on_delete=models.CASCADE,null=True,blank=True)
     color = models.ForeignKey(Color,on_delete=models.CASCADE,null=True,blank=True)
     quantity = models.IntegerField(default=0)
+    custom_text = models.CharField(max_length=10,null=True)
+
