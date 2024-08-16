@@ -1,3 +1,4 @@
+import time
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from drf_spectacular.utils import OpenApiRequest, OpenApiResponse, extend_schema
@@ -46,9 +47,14 @@ def register(request):
 )
 @api_view(["POST"])
 def login(request):
+    start_time = time.time()
     serializer = LoginSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = authenticate(email=request.data["email"],password=request.data["password"])
+    end_time = time.time()  # End the timer
+
+    duration_ms = (end_time - start_time) * 1000
+    print(duration_ms)
     if user is None:
         return Response("Invalid Credentials",status=status.HTTP_400_BAD_REQUEST)
     

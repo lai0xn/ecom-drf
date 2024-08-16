@@ -15,7 +15,6 @@ class User(AbstractUser,PermissionsMixin):
     is_admin = models.BooleanField(default=False)
     username = None
     full_name = models.CharField(max_length=50,null=False)
-    password = models.CharField(max_length=100,null=False)
     email = models.EmailField(unique=True,null=False)
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []

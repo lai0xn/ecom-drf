@@ -47,6 +47,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'drf_spectacular',
+    'silk',
+
 
 ]
 
@@ -61,7 +63,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'silk.middleware.SilkyMiddleware',
 ]
+
+
 
 ROOT_URLCONF = 'ecom.urls'
 
@@ -133,8 +138,8 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 AUTHENTICATION_BACKENDS = [
-    'core.backends.EmailBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'django.contrib.auth.backends.ModelBackend',
+    'core.backends.EmailBackend'
 ]
 
 
@@ -149,6 +154,20 @@ USE_I18N = True
 
 USE_TZ = True
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.Argon2PasswordHasher',  # Example of using Argon2
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+]
+
+# If using Argon2, you can adjust its parameters
+ARGON2_PASSWORD_HASHER = {
+    'time_cost': 2,  # Decrease this for faster hashing
+    'memory_cost': 2 ** 16,  # Adjust memory cost as needed
+    'parallelism': 1,
+    'hash_len': 32,
+}
 
 JWT_SECRET = "ffkkjwyy223!@@#$@$FASFFa"
 
@@ -170,3 +189,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.User'
+
+SILKY_PYTHON_PROFILER = True  # Enable Python profiler
+SILKY_PYTHON_PROFILER_BINARY = False  # Store profiling data in binary format
+SILKY_ANALYZE_SQL = True  # Analyze SQL queries
+SILKY_MAX_SQL_LENGTH = 1000
