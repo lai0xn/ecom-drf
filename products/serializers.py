@@ -27,10 +27,8 @@ class MediaSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
-    sizes = SizeSerializer(many=True)
-    colors = ColorSerializer(many=True)
-    reviews = serializers.SerializerMethodField()
-    media = MediaSerializer(many=True)
+    review_set = ReviewSeralizer(many=True,required=False,read_only=True)
+    media_set = MediaSerializer(many=True,required=False,read_only=True)
     class Meta:
         model = Product
         fields="__all__"

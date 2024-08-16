@@ -1,15 +1,22 @@
 from django.contrib.auth import authenticate
 from django.shortcuts import render
 from drf_spectacular.utils import OpenApiRequest, OpenApiResponse, extend_schema
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import status
 from .serializers import LoginSerializer, UserSerializer
 # Create your views here.
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def user(request):
-    return Response("Hello World",status=status.HTTP_200_OK)
+    user = request.user
+    return Response({
+        "name":user.full_name,
+        "email":user.email,
+        "is_admin":user.is_admin
+    },status=status.HTTP_200_OK)
 
 
 

@@ -29,6 +29,7 @@ class Product(models.Model):
 
 class Media(models.Model):
     image = models.ImageField(upload_to="products")
+    primary = models.BooleanField(default=False)
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
 
 
