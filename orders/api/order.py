@@ -20,14 +20,25 @@ class OrderView(viewsets.ModelViewSet):
             permission_classes = [IsAdminOrOwner]
         return [permission() for permission in permission_classes]
 
-
     def create(self, request, *args, **kwargs):
         items = request.user.cart.items
-        request.data["items"] = items
-        price = 0
-        for item in items:
-            price += item.product.price * item.quantity
-        request.data["price"] = price
-        serializer = OrderSerializer(data=request.data)
-        serializer.save(raise_exception=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+        if not items.exists():
+            return Response({"detail": "Cart is empty."}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = request.data.copy()
+        data["items"] = list(items.values_list('id', flat=True))
+    
+        # Calculate the total price
+        price = sum(item.product.price * item.quantity for item in items.all())
+        data["price"] = price
+        data["user"] = request.user.id
+    
+        # Use the serializer to validate and save the order
+        serializer = OrderSerializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        
+        items.update(cart=None)
+    
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    

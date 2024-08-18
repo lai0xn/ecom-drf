@@ -8,10 +8,10 @@ CATEGORIES = {"Abaya":"Abaya","Planner":"Planner"}
 USER_MODEL = get_user_model()
 
 class Size(models.Model):
-    size = models.CharField(max_length=10)
+    size = models.CharField(max_length=100)
    
 class Color(models.Model):
-    color = models.CharField(max_length=10)
+    color = models.CharField(max_length=100)
 
 
 
@@ -24,6 +24,7 @@ class Product(models.Model):
     colors = models.ManyToManyField(Color,null=True,blank=True)
     price = models.IntegerField(null=False)
     created = models.DateTimeField(auto_now_add=True)
+    custom_text = models.BooleanField(default=False)
     in_stock = models.IntegerField(default=1,null=False)
 
 
@@ -38,3 +39,4 @@ class Review(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     stars = models.IntegerField()
     content = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)

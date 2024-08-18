@@ -1,31 +1,60 @@
-from django.core.serializers import serialize
-from django.db.models import query
 from rest_framework.decorators import api_view,permission_classes
 from rest_framework.mixins import status
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK
 from django.shortcuts import get_object_or_404
-from ..models.cart import Cart
-from ..models.items import OrderItem
 from ..serializers.cart import CartSerializer
-from products.models import Product
-
+from products.models import Color, Product,Size
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import status
+from django.db import transaction
+from ..models import Cart,OrderItem
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_current_cart(request):
     serializer = CartSerializer(request.user.cart,many=False)
     return Response(serializer.data,status=status.HTTP_200_OK)
 
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-def add_to_cart(request,id):
+def add_to_cart(request, id):
     cart = request.user.cart
-    product = Product.objects.get(id=id)
     
-    size = request.data.get("size",None)
-    color = request.data.get("color",None)
-    quantity = request.data.get("quantity",1)
+    try:
+        product = Product.objects.get(id=id)
+    except Product.DoesNotExist:
+        return Response({"error": "Product not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    size_id = request.data.get("size", None)
+    color_id = request.data.get("color", None)
+    quantity = request.data.get("quantity", 1)
+
+    try:
+        quantity = int(quantity)
+        if quantity <= 0:
+            return Response({"error": "Quantity must be a positive integer"}, status=status.HTTP_400_BAD_REQUEST)
+    except ValueError:
+        return Response({"error": "Invalid quantity"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if product.in_stock < quantity:
+        return Response({"error": "Not enough stock available"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        size = Size.objects.get(id=size_id) if size_id else None
+    except Size.DoesNotExist:
+        return Response({"error": "Invalid size ID"}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        color = Color.objects.get(id=color_id) if size_id else None
+    except Color.DoesNotExist:
+        return Response({"error": "Invalid size ID"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
     item_q = OrderItem.objects.filter(
         cart=cart,
         product=product,
@@ -33,30 +62,26 @@ def add_to_cart(request,id):
         color=color,
     )
 
+    with transaction.atomic():
+        if item_q.exists():
+            item = item_q.first()
+            item.quantity += quantity
+            item.save()
+            message = "Increased quantity"
+        else:
+            OrderItem.objects.create(
+                product=product,
+                cart=cart,
+                quantity=quantity,
+                color=color,
+                size=size
+            )
+            message = "Product added to cart"
 
-    if item_q.exists():
-        item = item_q[0]
-        item.quantity+=quantity
-        item.save()
-        
         product.in_stock -= quantity
         product.save()
-        return Response("Increased quantity",status=status.HTTP_200_OK)
-    
-    OrderItem.objects.create(
-        product=product,
-        cart=cart,
-        quantity=quantity,
-        color=color,
-        size=size 
-    )
 
-    
-    product.in_stock -= quantity
-    product.save()
-
-
-    return Response("Proruct added to cart",status=status.HTTP_200_OK)
+    return Response(message, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
