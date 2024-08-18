@@ -1,11 +1,22 @@
 from rest_framework import serializers
+
+from users.models import User
+from users.serializers import UserSerializer
 from .models import Media, Product, Review,Size,Color
 
 
 class ReviewSeralizer(serializers.ModelSerializer):
+    user_detail = serializers.SerializerMethodField(read_only=True)
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(),write_only=True)
     class Meta:
         model = Review
         fields = '__all__'
+
+    def get_user_detail(self,obj):
+        serializer = UserSerializer(obj.user,many=False)
+        return serializer.data
+        
+         
 
 
 class SizeSerializer(serializers.ModelSerializer):
