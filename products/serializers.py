@@ -1,8 +1,8 @@
 from rest_framework import serializers
 
-from users.models import User
+from users.models import Email, User
 from users.serializers import UserSerializer
-from .models import Media, Product, Review,Size,Color
+from .models import Media, Product, Review,Size,Color, WishList
 
 
 class ReviewSeralizer(serializers.ModelSerializer):
@@ -40,9 +40,23 @@ class ProductSerializer(serializers.ModelSerializer):
     rating = serializers.SerializerMethodField()
     review_set = ReviewSeralizer(many=True,required=False,read_only=True)
     media_set = MediaSerializer(many=True,required=False,read_only=True)
+    colors = serializers.PrimaryKeyRelatedField(queryset=Color.objects.all(),many=True,write_only=True)
+    sizes = serializers.PrimaryKeyRelatedField(queryset=Size.objects.all(),many=True,write_only=True)
+    colors_data = serializers.SerializerMethodField()
+    sizes_data = serializers.SerializerMethodField()
+    
     class Meta:
         model = Product
         fields="__all__"
+
+    def get_colors_data(self,obj):
+        serializer = ColorSerializer(obj.colors,many=True)
+        return serializer.data
+        
+
+    def get_sizes_data(self,obj):
+        serializer = SizeSerializer(obj.sizes,many=True)
+        return serializer.data
 
     
 
@@ -57,3 +71,23 @@ class ProductSerializer(serializers.ModelSerializer):
             return rating/enteries
         return 0
 
+
+
+class WishListSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    class Meta:
+        model = WishList
+        fields = "__all__"
+
+    def get_user(self,obj):
+        return {
+            "id":obj.user.id,
+            "name":obj.user.full_name,
+            "email":obj.user.email
+        }
+
+
+class MailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Email
+        fields = "__all__"

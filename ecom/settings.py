@@ -95,7 +95,7 @@ WSGI_APPLICATION = 'ecom.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': '/data/db.sqlite3',
     }
 }
 
@@ -103,9 +103,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'core.auth.JWTAuthentication',
     ],
-    'DEFAULT_PERMISSION_CLASSES':(
+    'DEFAULT_PERMISSION_CLASSES':[
         "rest_framework.permissions.AllowAny",
-    ),
+    ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -180,7 +180,7 @@ MEDIA_URL = 'media/'
 
 
 
-MEDIA_ROOT = os.path.join(BASE_DIR,"media")
+MEDIA_ROOT = "/data/uploads"
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
@@ -194,3 +194,7 @@ SILKY_PYTHON_PROFILER = True  # Enable Python profiler
 SILKY_PYTHON_PROFILER_BINARY = False  # Store profiling data in binary format
 SILKY_ANALYZE_SQL = True  # Analyze SQL queries
 SILKY_MAX_SQL_LENGTH = 1000
+
+YALIDINE_BASE_URL = "https://api.yalidine.app/v1/"
+YALIDINE_API_ID = "91282672304573578766"
+YALIDINE_API_TOKEN = "rdgTRK78FWssG0aP2BopuZ48SE5XaVLo5kwQPH3FckEeD1DA6tfjmYgm01vQdNyS"

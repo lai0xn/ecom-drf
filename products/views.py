@@ -1,8 +1,15 @@
+from django.shortcuts import get_object_or_404
+from rest_framework import viewsets
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
+from rest_framework.views import status
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
-from .serializers import ColorSerializer, MediaSerializer, ProductSerializer, ReviewSeralizer, SizeSerializer
+
+from users.models import Email
+from .serializers import ColorSerializer, MailSerializer, MediaSerializer, ProductSerializer, ReviewSeralizer, SizeSerializer, WishListSerializer
 from core.perms import IsAdminOrReadOnly, OwnerOrReadOnly
-from .models import Color, Media, Product, Review, Size
+from .models import Color, Media, Product, Review, Size, WishList
 # Create your views here.
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
@@ -35,3 +42,55 @@ class ReviewViewSet(ModelViewSet):
     def create(self, request, *args, **kwargs):
         request.data["user"] = request.user.id
         return super().create(request, *args, **kwargs)
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def add_to_wishlist(request, id):
+    # Get or create the wishlist for the current user
+    wishlist, created = WishList.objects.get_or_create(user=request.user)
+    
+    # Get the product or return a 404 response if not found
+    product = get_object_or_404(Product, id=id)
+    
+    # Add the product to the wishlist
+    if product not in wishlist.products.all():
+        wishlist.products.add(product)
+        return Response({"message": "Product added to wishlist"}, status=status.HTTP_200_OK)
+    else:
+        return Response({"message": "Product already in wishlist"}, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def remove_from_wishlist(request,id):
+    wishlist = get_object_or_404(WishList,user=request.user)
+    product = get_object_or_404(Product,id=id)
+    wishlist.products.remove(product)
+    return Response("Product remove from wishlist",status=status.HTTP_200_OK)
+
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_wishlist(request):
+    wishlist = get_object_or_404(WishList,user=request.user)
+    serializer = WishListSerializer(wishlist,many=False)
+    return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+
+
+@api_view(["GET"])
+@permission_classes([IsAdminUser])
+def get_emails(request):
+    emails = Email.objects.all()
+    serializer = MailSerializer(emails,many=True)
+    return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+
+
+@api_view(["POST"])
+def add_email(request):
+    serializer = MailSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(data=serializer.data,status=status.HTTP_200_OK)

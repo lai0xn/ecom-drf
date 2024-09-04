@@ -10,4 +10,4 @@ class CartSerializer(serializers.ModelSerializer):
         model = Cart
         fields = '__all__'
 
-   
+    

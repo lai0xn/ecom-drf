@@ -3,9 +3,12 @@ from django.contrib.auth import authenticate
 from django.shortcuts import render
 from drf_spectacular.utils import OpenApiRequest, OpenApiResponse, extend_schema
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import status
+
+from orders.models.order import Order
+from users.models import User
 from .serializers import LoginSerializer, UserSerializer
 # Create your views here.
 
@@ -19,7 +22,35 @@ def user(request):
         "is_admin":user.is_admin
     },status=status.HTTP_200_OK)
 
+@api_view(["GET"])
+@permission_classes([IsAdminUser])
+def all_users(request):
+    serializer = UserSerializer(User.objects.all(),many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)
 
+@api_view(["GET"])
+@permission_classes([IsAdminUser])
+def get_customers(request):
+    users = User.objects.filter(order__isnull=False,order__state="delivered").distinct()
+    serializer = UserSerializer(users,many=True)
+    return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+
+@api_view(["GET"])
+@permission_classes([IsAdminUser])
+def admin_stats(request):
+    users_count = len(User.objects.all())
+    customer_count = len(User.objects.filter(order__isnull=False,order__state="delivered").distinct())
+    total_orders = Order.objects.exclude(state="canceled")
+    total_revenue = sum([order.price for order in Order.objects.filter(state="delivered")])
+    return Response(data={
+        "users_count":users_count,
+        "customer_count":customer_count,
+        "total_revenue":total_revenue,
+        "total_orders":total_orders
+
+    },status=status.HTTP_200_OK)
 
 
 @extend_schema(
@@ -61,4 +92,8 @@ def login(request):
     token = user.generate_jwt()
 
     return Response({"token":token},status=status.HTTP_200_OK)
-    
+   
+
+
+
+

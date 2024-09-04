@@ -33,7 +33,7 @@ def add_to_cart(request, id):
     size_id = request.data.get("size", None)
     color_id = request.data.get("color", None)
     quantity = request.data.get("quantity", 1)
-
+    custom_text = request.data.get("custom_text",None)
     try:
         quantity = int(quantity)
         if quantity <= 0:
@@ -41,25 +41,22 @@ def add_to_cart(request, id):
     except ValueError:
         return Response({"error": "Invalid quantity"}, status=status.HTTP_400_BAD_REQUEST)
 
-    if product.in_stock < quantity:
-        return Response({"error": "Not enough stock available"}, status=status.HTTP_400_BAD_REQUEST)
+       
+    size = None
+    color = None
 
-    try:
-        size = Size.objects.get(id=size_id) if size_id else None
-    except Size.DoesNotExist:
-        return Response({"error": "Invalid size ID"}, status=status.HTTP_400_BAD_REQUEST)
-    try:
-        color = Color.objects.get(id=color_id) if size_id else None
-    except Color.DoesNotExist:
-        return Response({"error": "Invalid size ID"}, status=status.HTTP_400_BAD_REQUEST)
-
-
+    if size_id:
+        size = get_object_or_404(Size,id=size_id)
+    
+    if color_id:
+        color = get_object_or_404(Color,id=color_id)
 
     item_q = OrderItem.objects.filter(
         cart=cart,
         product=product,
         size=size,
         color=color,
+        custom_text=custom_text
     )
 
     with transaction.atomic():
@@ -74,12 +71,11 @@ def add_to_cart(request, id):
                 cart=cart,
                 quantity=quantity,
                 color=color,
-                size=size
+                size=size,
+                custom_text=custom_text
             )
             message = "Product added to cart"
 
-        product.in_stock -= quantity
-        product.save()
 
     return Response(message, status=status.HTTP_200_OK)
 

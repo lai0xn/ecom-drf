@@ -30,3 +30,10 @@ class User(AbstractUser,PermissionsMixin):
         token = jwt.encode(claims,settings.JWT_SECRET,algorithm="HS256")
         return token
 
+
+
+    
+class Email(models.Model):
+    name = models.CharField(max_length=50)
+    email = models.EmailField()
+

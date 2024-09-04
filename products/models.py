@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 
 CATEGORIES = {"Abaya":"Abaya","Planner":"Planner"}
 
+STOCK = {"available":"available","out of stock":"out of stock","hidden":"hidden"}
 
 USER_MODEL = get_user_model()
 
@@ -25,7 +26,7 @@ class Product(models.Model):
     price = models.IntegerField(null=False)
     created = models.DateTimeField(auto_now_add=True)
     custom_text = models.BooleanField(default=False)
-    in_stock = models.IntegerField(default=1,null=False)
+    in_stock = models.CharField(choices=STOCK,max_length=20)
 
 
 class Media(models.Model):
@@ -40,3 +41,9 @@ class Review(models.Model):
     stars = models.IntegerField()
     content = models.TextField()
     created = models.DateTimeField(auto_now_add=True)
+
+
+
+class WishList(models.Model):
+    user = models.OneToOneField(USER_MODEL,on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product)
