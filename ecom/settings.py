@@ -91,13 +91,14 @@ WSGI_APPLICATION = 'ecom.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR/'db.sqlite3',
+    "default": {
+        "ENGINE": "libsql.db.backends.sqlite3",
+        "NAME": "libsql://namareq-lai0xn.turso.io?authToken=eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MjU2NjUxODcsImlkIjoiZDdkN2RiMTYtODQyMS00MmYyLTlkNDMtMzQ1ODUyNjQ1ODIwIn0.SzoQSf6_wuAlumIdg8GTz0X-onaIcFJklCsD0AkShGW1W_0X5-7WdQacRCNIVVBszk_FEt9rdxNN_IPAUutzCg"
+,
     }
 }
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
