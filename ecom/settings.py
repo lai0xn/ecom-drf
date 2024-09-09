@@ -91,12 +91,24 @@ WSGI_APPLICATION = 'ecom.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
 DATABASES = {
-    "default": {
-        "ENGINE": "libsql.db.backends.sqlite3",
-        "NAME": "libsql://namareq-lai0xn.turso.io?authToken=eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE3MjU2NjUxODcsImlkIjoiZDdkN2RiMTYtODQyMS00MmYyLTlkNDMtMzQ1ODUyNjQ1ODIwIn0.SzoQSf6_wuAlumIdg8GTz0X-onaIcFJklCsD0AkShGW1W_0X5-7WdQacRCNIVVBszk_FEt9rdxNN_IPAUutzCg"
-,
-    }
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'defaultdb',
+        'USER': 'doadmin',
+        'PASSWORD': 'AVNS_sY1l8lfxsCUq6grGzSN',
+        'HOST': 'db-postgresql-fra1-72125-do-user-17605934-0.h.db.ondigitalocean.com',
+        'PORT': '25060',
+        'OPTIONS': {
+            'sslmode': 'require',  # SSL mode options: disable, allow, prefer, require, verify-ca, verify-full
+            # Optional certificates (if needed):
+            # 'sslcert': '/path/to/client.crt',
+            # 'sslkey': '/path/to/client.key',
+            # 'sslrootcert': '/path/to/ca.crt',
+        },
+    },
+
 }
 
 

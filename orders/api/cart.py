@@ -74,7 +74,7 @@ def add_to_cart(request, id):
                 size=size,
                 custom_text=custom_text
             )
-            message = "Product added to cart"
+            message = "product added to cart"
 
 
     return Response(message, status=status.HTTP_200_OK)
@@ -84,12 +84,18 @@ def add_to_cart(request, id):
 @permission_classes([IsAuthenticated])
 def remove_from_cart(request,id):
     cart = request.user.cart
-    
+    quantity = request.data.get("quantity",None)
     order_item = get_object_or_404(OrderItem, id=id, cart=cart)
-    
-    order_item.delete()
+    if quantity == None:
+        order_item.delete()
+        return Response("proruct deleted from cart",status=status.HTTP_200_OK) 
 
-    return Response("Proruct deleted from cart",status=status.HTTP_200_OK) 
+    else:
+        if quantity >= order_item.quantity:
+            return Response("Can't decrease this amount",status=status.HTTP_400_BAD_REQUEST)
+        order_item.quantity -= quantity
+        order_item.save()
+        return Response("item quantity decreased")
 
 
 @api_view(["POST"])
