@@ -12,12 +12,13 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
-
+from dotenv import load_dotenv
 from django.conf.global_settings import AUTHENTICATION_BACKENDS
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -95,11 +96,11 @@ WSGI_APPLICATION = 'ecom.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'defaultdb',
-        'USER': 'doadmin',
-        'PASSWORD': 'AVNS_sY1l8lfxsCUq6grGzSN',
-        'HOST': 'db-postgresql-fra1-72125-do-user-17605934-0.h.db.ondigitalocean.com',
-        'PORT': '25060',
+        'NAME': os.getenv("DB_NAME"),
+        'USER': os.getenv("DB_USER"),
+        'PASSWORD': os.getenv("DB_PASSWORD"),
+        'HOST': os.getenv("DB_HOST"),
+        'PORT': os.getenv("DB_PORT"),
         'OPTIONS': {
             'sslmode': 'require',  # SSL mode options: disable, allow, prefer, require, verify-ca, verify-full
             # Optional certificates (if needed):
@@ -182,7 +183,7 @@ ARGON2_PASSWORD_HASHER = {
     'hash_len': 32,
 }
 
-JWT_SECRET = "ffkkjwyy223!@@#$@$FASFFa"
+JWT_SECRET = os.getenv("JWT_SECRET")
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -209,5 +210,5 @@ SILKY_ANALYZE_SQL = True  # Analyze SQL queries
 SILKY_MAX_SQL_LENGTH = 1000
 
 YALIDINE_BASE_URL = "https://api.yalidine.app/v1/"
-YALIDINE_API_ID = "91282672304573578766"
-YALIDINE_API_TOKEN = "rdgTRK78FWssG0aP2BopuZ48SE5XaVLo5kwQPH3FckEeD1DA6tfjmYgm01vQdNyS"
+YALIDINE_API_ID = os.getenv("YALIDINE_API_ID")
+YALIDINE_API_TOKEN = os.getenv("YALIDINE_API_TOKEN")
