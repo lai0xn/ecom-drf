@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from users.models import Email, User
 from users.serializers import UserSerializer
-from .models import Media, Product, Review,Size,Color, WishList
+from .models import Coupon, Media, Product, Review,Size,Color, WishList
 
 
 class ReviewSeralizer(serializers.ModelSerializer):
@@ -18,6 +18,11 @@ class ReviewSeralizer(serializers.ModelSerializer):
         
          
 
+
+class CouponSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Coupon
+        fields = "__all__"
 
 class SizeSerializer(serializers.ModelSerializer):
     class Meta:

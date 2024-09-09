@@ -47,3 +47,8 @@ class Review(models.Model):
 class WishList(models.Model):
     user = models.OneToOneField(USER_MODEL,on_delete=models.CASCADE)
     products = models.ManyToManyField(Product)
+
+
+class Coupon(models.Model):
+    name = models.CharField(max_length=100)
+    percentage = models.PositiveIntegerField(default=0) 

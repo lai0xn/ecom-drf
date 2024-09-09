@@ -7,15 +7,20 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from users.models import Email
-from .serializers import ColorSerializer, MailSerializer, MediaSerializer, ProductSerializer, ReviewSeralizer, SizeSerializer, WishListSerializer
+from .serializers import ColorSerializer, CouponSerializer, MailSerializer, MediaSerializer, ProductSerializer, ReviewSeralizer, SizeSerializer, WishListSerializer
 from core.perms import IsAdminOrReadOnly, OwnerOrReadOnly
-from .models import Color, Media, Product, Review, Size, WishList
+from .models import Color, Coupon, Media, Product, Review, Size, WishList
 # Create your views here.
 class ProductViewSet(ModelViewSet):
     serializer_class = ProductSerializer
     permission_classes = [IsAdminOrReadOnly]
     queryset = Product.objects.all()
 
+
+class CouponViewSet(ModelViewSet):
+    serializer_class = CouponSerializer
+    permission_classes = [IsAdminUser]
+    queryset = Coupon.objects.all()
 
 class SizeViewSet(ModelViewSet):
     serializer_class = SizeSerializer
@@ -85,6 +90,18 @@ def get_emails(request):
     emails = Email.objects.all()
     serializer = MailSerializer(emails,many=True)
     return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def check_coupon(request):
+    coupon = request.data.get("coupon",None)
+    if coupon == None:
+        return Response("no coupon provided",status=status.HTTP_400_BAD_REQUEST)
+    coupon_model = get_object_or_404(Coupon,name=coupon)
+    serializer = CouponSerializer(coupon_model,many=False)
+    return Response(data=serializer.data,status=status.HTTP_200_OK)
+
 
 
 

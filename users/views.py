@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import status
-
+from django.db.models import Sum
 from orders.models.order import Order
 from users.models import User
 from .serializers import LoginSerializer, UserSerializer
@@ -40,17 +40,17 @@ def get_customers(request):
 @api_view(["GET"])
 @permission_classes([IsAdminUser])
 def admin_stats(request):
-    users_count = len(User.objects.all())
-    customer_count = len(User.objects.filter(order__isnull=False,order__state="delivered").distinct())
-    total_orders = Order.objects.exclude(state="canceled")
-    total_revenue = sum([order.price for order in Order.objects.filter(state="delivered")])
+    users_count = User.objects.count()  # Efficient count of all users
+    customer_count = User.objects.filter(order__isnull=False, order__state="delivered").distinct().count()  # Efficient customer count
+    total_orders = Order.objects.exclude(state="canceled").count()  # Count of non-canceled orders
+    total_revenue = Order.objects.filter(state="delivered").aggregate(total=Sum('price'))['total'] or 0  # Efficient revenue calculation
+    
     return Response(data={
-        "users_count":users_count,
-        "customer_count":customer_count,
-        "total_revenue":total_revenue,
-        "total_orders":total_orders
-
-    },status=status.HTTP_200_OK)
+        "users_count": users_count,
+        "customer_count": customer_count,
+        "total_revenue": total_revenue,
+        "total_orders": total_orders
+    }, status=status.HTTP_200_OK)
 
 
 @extend_schema(

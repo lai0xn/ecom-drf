@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 import requests
 from django.conf import settings
 from rest_framework import status, viewsets
@@ -5,6 +6,7 @@ from rest_framework.mixins import Response
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from core.perms import IsAdminOrOwner, IsOwner
+from products.models import Coupon
 from ..serializers.order import OrderSerializer
 from ..models.order import Order
 
@@ -33,6 +35,10 @@ class OrderView(viewsets.ModelViewSet):
         print(data["items"])
         # Calculate the total price
         price = sum(item.product.price * item.quantity for item in items.all())
+        coupon_q = request.data.get("coupon")
+
+        coupon = get_object_or_404(Coupon,name=coupon_q)
+        price = price - (coupon.percentage/100 * price)
         data["price"] = price
         data["user"] = request.user.id
     
@@ -119,7 +125,9 @@ def get_fees(request):
     params = {}
 
     if wilaya_id:
-        params["wilaya_id"] = wilaya_id
+        params["from_wilaya_id"] = 16
+        params["to_wilaya_id"] = wilaya_id
+
 
     resp = requests.get(url,headers={
         "X-API-ID":settings.YALIDINE_API_ID,
