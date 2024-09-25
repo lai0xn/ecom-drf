@@ -35,10 +35,10 @@ class OrderView(viewsets.ModelViewSet):
         print(data["items"])
         # Calculate the total price
         price = sum(item.product.price * item.quantity for item in items.all())
-        coupon_q = request.data.get("coupon")
-
-        coupon = get_object_or_404(Coupon,name=coupon_q)
-        price = price - (coupon.percentage/100 * price)
+        coupon_q = request.data.get("coupon",None)
+        if coupon_q:
+            coupon = get_object_or_404(Coupon,name=coupon_q)
+            price = price - (coupon.percentage/100 * price)
         data["price"] = price
         data["user"] = request.user.id
     
@@ -120,7 +120,7 @@ def get_fees(request):
     if wilaya_id is None:
         return Response("You need to provide wilaya_id as a query param",status=status.HTTP_400_BAD_REQUEST)
 
-    url = settings.YALIDINE_BASE_URL +"deliveryfees/"
+    url = settings.YALIDINE_BASE_URL +"fees/"
     
     params = {}
 
