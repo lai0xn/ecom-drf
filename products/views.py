@@ -118,8 +118,8 @@ def get_recommended(request):
     number = request.GET.get("number")
     products = Product.objects.reverse().all()
     if len(products) > int(number):
-        serializer = ProductSerializer(products[-number:])
+        serializer = ProductSerializer(products[-number:],many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
     else:
-        serializer = ProductSerializer(products)
+        serializer = ProductSerializer(products,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
