@@ -117,8 +117,7 @@ def add_email(request):
 def get_recommended(request):
     number = request.GET.get("number")
     products = Product.objects.reverse().all()
-    if len(products) > number:
-
+    if len(products) > int(number):
         serializer = ProductSerializer(products[-number:])
         return Response(serializer.data,status=status.HTTP_200_OK)
     else:
