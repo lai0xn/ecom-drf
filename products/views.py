@@ -116,6 +116,9 @@ def add_email(request):
 @api_view(["GET"])
 def get_recommended(request):
     number = request.GET.get("number")
-    products = Product.objects.all()[:number]
-    serializer = ProductSerializer(products)
-    return Response(serializer.data,status=status.HTTP_200_OK)
+    try:
+        products = Product.objects.all()[:number]
+        serializer = ProductSerializer(products)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+    except Exception:
+        return Response("No products",status=status.HTTP_500_INTERNAL_SERVER_ERROR)
