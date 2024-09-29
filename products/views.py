@@ -111,3 +111,11 @@ def add_email(request):
     serializer.is_valid(raise_exception=True)
     serializer.save()
     return Response(data=serializer.data,status=status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def get_recommended(request):
+    number = request.GET.get("number")
+    products = Product.objects.all()[:number]
+    serializer = ProductSerializer(products)
+    return Response(serializer.data,status=status.HTTP_200_OK)
