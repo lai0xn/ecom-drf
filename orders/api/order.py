@@ -35,13 +35,17 @@ class OrderView(viewsets.ModelViewSet):
         print(data["items"])
         # Calculate the total price
         price = sum(item.product.price * item.quantity for item in items.all())
-        coupon_q = request.data.get("coupon",None)
+        coupon_q = request.data.get("coupon",None) 
+        custom_text = request.data.get("custom_text",None)
         if coupon_q:
             coupon = get_object_or_404(Coupon,name=coupon_q)
             price = price - (coupon.percentage/100 * price)
+
+        if custom_text:
+            price += 150
         data["price"] = price
         data["user"] = request.user.id
-    
+
         # Use the serializer to validate and save the order
         serializer = OrderSerializer(data=data)
         serializer.is_valid(raise_exception=True)
