@@ -115,11 +115,9 @@ def add_email(request):
 
 @api_view(["GET"])
 def get_recommended(request):
-    number = request.GET.get("number")
-    products = Product.objects.reverse().all()
-    if len(products) > int(number):
-        serializer = ProductSerializer(products[-int(number):],many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
-    else:
-        serializer = ProductSerializer(products,many=True)
-        return Response(serializer.data,status=status.HTTP_200_OK)
+    number = int(request.GET.get("number", 0))  # Default to 0 if 'number' is not provided
+    products = Product.objects.order_by('-id')  # Get products in reverse order by id
+    if number > 0 and number < products.count():
+        products = products[:number]  # Slice the QuerySet correctly from the beginning
+    serializer = ProductSerializer(products, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
